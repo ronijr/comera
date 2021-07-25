@@ -6,6 +6,7 @@ class Tunjangan extends CI_Controller {
     public function __construct()
     {
         parent::__construct();
+        $this->secure->is_login();
         $this->load->model('md_tunjangan');
     }
 
