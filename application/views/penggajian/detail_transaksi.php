@@ -44,13 +44,13 @@
                   'class'       => 'form form-horizontal',
                   'enctype'     =>'multipart/form-data'
                 );
-                echo form_open('penggajian/doupdate', $attributes);
+                echo form_open('penggajian/transaksi_docreate', $attributes);
               ?>
-                <input type="hidden" value="<?php echo $karyawan[0]->pg_id; ?>" name="pg_id">
+                <input type="hidden" value="<?php echo $txp_id;?>"  name="txp_id">
                 <div class="form-group">
                     <label class="col-sm-2 control-label" for="form-control-1">User ID</label>
                     <div class="col-sm-3  <?php if(form_error('user_id') != ""): ?> has-error has-feedback <?php endif; ?>" >
-                        <input readonly id="form-control-1" class="form-control" type="text" value="<?php echo $karyawan[0]->kry_no; ?>" name="userid">
+                        <input readonly id="form-control-1" class="form-control" type="text" value="<?php echo $karyawan[0]->kry_no; ?>" name="user_id">
                         <?php if(form_error('user_id') != ""): ?>
                         <span class="form-control-feedback" aria-hidden="true">
                             <span class="icon icon-times"></span>
@@ -98,7 +98,7 @@
                 <div class="form-group">
                     <label class="col-sm-2 control-label" for="form-control-1">Gaji Pokok</label>
                     <div class="col-sm-6  <?php if(form_error('gaji_pokok') != ""): ?> has-error has-feedback <?php endif; ?>" >
-                        <input id="form-control-1" class="form-control"   readonly type="text" value="<?php echo (set_value('gaji_pokok') == "") ? $karyawan[0]->pg_gaji_pokok : set_value('gaji_pokok'); ?>" name="gaji_pokok">
+                        <input id="form-control-1" class="form-control"   readonly type="text" value="<?php echo (set_value('gaji_pokok') == "") ? number_format($karyawan[0]->pg_gaji_pokok) : set_value('gaji_pokok'); ?>" name="gaji_pokok">
                         <?php if(form_error('gaji_pokok') != ""): ?>
                         <span class="form-control-feedback" aria-hidden="true">
                             <span class="icon icon-times"></span>
@@ -134,21 +134,50 @@
                         <table class="table table-striped table-sm">
                             <thead>
                                 <tr>
-                                    <th style="width:180px;">Nama</th>
-                                    <th>Nilai</th>
+                                    <th style="width:180px;">Tanggal</th>
+                                    <th>Range</th>
+                                    <th>Durasi</th>
+                                    <th>Ket</th>
                                 </tr>
                              </thead>
                              <tbody id="tunjangan_list">
-                                <?php foreach($tunjangans as $row): ?>
-                                    <tr class="row-<?php echo $row->txt_id; ?>">
-                                        <td><?php echo $row->tj_nama; ?> </td>
-                                        <td>Rp<?php echo number_format($row->tj_nilai);?> </td>
+                                 <?php $sum_lembur = 0; ?>
+                                <?php foreach($lemburan as $row): ?>
+                                   <?php $sum_lembur += $row->lbr_qty; ?>
+                                    <tr class="row-<?php echo $row->lbr_id; ?>">
+                                        <td><?php echo date('D , d M y',strtotime($row->lbr_tanggal)); ?> </td>
+                                        <td><?php echo date('H:i',strtotime($row->lbr_jam_mulai)); ?> - <?php echo date('H:i',strtotime($row->lbr_jam_selesai)); ?></td>
+                                        <td><?php echo $row->lbr_qty; ?> Jam</td>
+                                        <td><?php echo $row->lbr_deskripsi; ?></td>
                                     </tr>
                                 <?php endforeach; ?>
                             </tbody>
                         </table>
                     </div>
                 </div>
+                <?php if(count($lemburan) > 0) : ?>
+                <div class="form-group">
+                    <label class="col-sm-2 control-label" for="form-control-6">&nbsp;</label>
+                    <div class="col-sm-3  <?php if(form_error('nilai_lembur') != ""): ?> has-error has-feedback <?php endif; ?>" >
+                        <input id="form-control-1" class="form-control" key="<?php echo $sum_lembur; ?>" type="number" value="0" name="nilai_lembur">
+                        <?php if(form_error('nilai_lembur') != ""): ?>
+                        <span class="form-control-feedback" aria-hidden="true">
+                            <span class="icon icon-times"></span>
+                        </span>
+                        <?php echo form_error('nilai_lembur','<p class="help-block">','</p>'); ?>
+                        <?php endif; ?>
+                    </div>
+                    <div class="col-sm-3  <?php if(form_error('nilai_total_lembur') != ""): ?> has-error has-feedback <?php endif; ?>" >
+                        <input id="form-control-1" class="form-control" readonly type="text" value="0" name="nilai_total_lembur">
+                        <?php if(form_error('nilai_total_lembur') != ""): ?>
+                        <span class="form-control-feedback" aria-hidden="true">
+                            <span class="icon icon-times"></span>
+                        </span>
+                        <?php echo form_error('nilai_total_lembur','<p class="help-block">','</p>'); ?>
+                        <?php endif; ?>
+                    </div>
+                </div>
+                <?php endif; ?>
                 <div class="form-group">
                     <label class="col-sm-2 control-label" for="form-control-6">Potongan</label>
                     <div class="col-sm-7">
@@ -163,18 +192,21 @@
                                 </tr>
                              </thead>
                              <tbody id="tunjangan_list">
+                                <?php $total_potongan = 0; ?>
                                 <?php foreach($potongans as $row): ?>
-                                    <tr class="row-<?php echo $row->txt_id; ?>">
+                                    <?php $total_potongan += ($row->tp_nilai * $row->txg_qty); ?>
+                                    <tr class="row-<?php echo $row->tp_id; ?>">
                                         <td><?php echo $row->tp_nama; ?> </td>
                                         <td>Rp<?php echo number_format($row->tp_nilai);?> </td>
-                                        <td><?php echo $row->tp_qty; ?></td>
-                                        <td><?php echo $row->tp_qty; ?></td>
-                                        <td><a href="#" class="btn btn-sm btn-danger" onclick="delete_data('<?php echo $row->txt_id ?>', '<?php echo base_url('penggajian/potongan_delete'); ?>')">Hapus</a></td>
+                                        <td><?php echo $row->txg_qty; ?></td>
+                                        <td><?php echo number_format($row->tp_nilai * $row->txg_qty); ?></td>
+                                        <td><a href="#" class="btn btn-sm btn-danger" onclick="delete_data('<?php echo $row->txg_id ?>', '<?php echo base_url('penggajian/potongan_delete'); ?>')">Hapus</a></td>
                                     </tr>
                                 <?php endforeach; ?>
                             </tbody>
                         </table>
                     </div>
+                    <input type="hidden" name="total_potongan" value="<?php echo $total_potongan; ?>">
                     <div class="col-sm-2">
                         <button  type="button" class="btn btn-sm btn-warning" data-toggle="modal" data-target="#exampleModal">Tambah Potongan</button>
                     </div>
@@ -206,12 +238,12 @@
                 <div class="form-group">
                     <label class="col-sm-2 control-label" for="form-control-6">Periode</label>
                     <div class="col-sm-3 <?php if(form_error('tahun') != ""): ?> has-error has-feedback <?php endif; ?>">
-                      <select id="form-control-6" class="form-control" name="tahun">
+                      <select id="form-control-6" class="form-control" name="tahun" readonly>
                         <option value="">Pilih Tahun</option>
                         <?php
                             foreach(get_tahun() as $key => $value)
                             {
-                              $val = (set_value('tahun') == '' ) ? $karyawan[0]->pg_status : set_value('tahun'); 
+                              $val = (set_value('tahun') == '' ) ? $tahun : set_value('tahun'); 
                               $selected = ($val == $key) ? 'selected' : '';
                               echo '<option value='.$key.' '.$selected.'>'.$value.'</option>';
                             }
@@ -225,12 +257,12 @@
                         <?php endif; ?>
                     </div>
                     <div class="col-sm-3 <?php if(form_error('bulan') != ""): ?> has-error has-feedback <?php endif; ?>">
-                      <select id="form-control-6" class="form-control" name="bulan">
+                      <select id="form-control-6" class="form-control" name="bulan" readonly>
                         <option value="">Pilih Bulan</option>
                         <?php
                             foreach(get_bulan() as $key => $value)
                             {
-                              $val = (set_value('bulan') == '' ) ? $karyawan[0]->pg_status : set_value('bulan'); 
+                              $val = (set_value('bulan') == '' ) ? $bulan : set_value('bulan'); 
                               $selected = ($val == $key) ? 'selected' : '';
                               echo '<option value='.$key.' '.$selected.'>'.$value.'</option>';
                             }
@@ -296,11 +328,14 @@
                   'class'       => 'form form-horizontal',
                   'enctype'     =>'multipart/form-data'
                 );
-                echo form_open('penggajian/transaksi_docreate', $attributes);
+                echo form_open('penggajian/docreate_potongan', $attributes);
               ?>
                <div class="form-group">
+                    <input type="hidden" value="<?php echo $txp_id;?>"  name="txp_id">
                     <input type="hidden" value="<?php echo $karyawan[0]->kry_no;?>"  name="kry_no">
                     <input type="hidden" value="<?php echo $karyawan[0]->kry_nama;?>"  name="kry_nama">
+                    <input type="hidden" value="<?php echo $tahun;?>"  name="tahun">
+                    <input type="hidden" value="<?php echo $bulan;?>"  name="bulan">
                     <label class="col-sm-2 control-label" for="form-control-6">Nama</label>
                     <div class="col-sm-6 <?php if(form_error('potongan') != ""): ?> has-error has-feedback <?php endif; ?>">
                       <select id="form-control-6" class="form-control potongan-change" name="potongan" required>

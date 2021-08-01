@@ -17,8 +17,15 @@ class Md_penggajian extends CI_Model
     public function insert_transaksi($data)
     {
         $this->db->insert('tbl_txn_penggajian',$data);
+        $insert_id = $this->db->insert_id();
+        return  $insert_id;
     }
 
+    public function update_potongan($data, $id)
+    {
+        $this->db->where('txp_id',$id);
+        $this->db->update('tbl_txn_penggajian',$data);
+    }
     public function get_list_karyawan()
     {
         $this->db->select('tbl_m_karyawan.kry_nama, 
@@ -58,6 +65,28 @@ class Md_penggajian extends CI_Model
         return $this->db->get();
     }
 
+
+    public function get_list_karyawan_byid2($userid,$periode)
+    {
+        $this->db->select('tbl_m_karyawan.kry_nama, 
+        tbl_m_karyawan.kry_no, 
+        tbl_m_karyawan.kry_image, 
+        tbl_m_karyawan.kry_jabatan, 
+        tbl_m_karyawan.kry_dept_nama,
+        tbl_m_karyawan.kry_jabatan_id,
+        nvl(tbl_m_penggajian.pg_id,0) pg_id,
+        nvl(tbl_m_penggajian.pg_gaji_pokok,0) pg_gaji_pokok,
+        tbl_txn_penggajian.txp_status');
+        $this->db->from('tbl_m_karyawan');
+        $this->db->join('tbl_m_penggajian','tbl_m_karyawan.kry_no = tbl_m_penggajian.kry_no','left');
+        $this->db->join('tbl_m_user','tbl_m_user.usr_username = tbl_m_karyawan.kry_no','left');
+        $this->db->join('tbl_txn_penggajian','tbl_txn_penggajian.kry_no = tbl_m_karyawan.kry_no','left');
+        $this->db->like('DATE_FORMAT(txp_periode,\'%Y-%m\')','DATE_FORMAT(\''.$periode.'\',\'%Y-%m\')','after');
+        $this->db->where_not_in('usr_type','owner');
+        $this->db->where('tbl_m_karyawan.kry_no',$userid);
+        return $this->db->get();
+    }
+
     public function get_list_karyawan_priode($tahun, $bulan)
     {
         $this->db->select('tbl_m_karyawan.kry_nama, 
@@ -77,7 +106,7 @@ class Md_penggajian extends CI_Model
                                 (select count(\'*\') from tbl_absensi where kry_no = tbl_m_karyawan.kry_no and abs_status = \'A\'  AND DATE_FORMAT(abs_tanggal, \'%Y-%m\') = \''.$tahun.'-'.$bulan.'\') alpa,
                                 (select count(\'*\') from tbl_absensi where kry_no = tbl_m_karyawan.kry_no and abs_status = \'C\'  AND DATE_FORMAT(abs_tanggal, \'%Y-%m\') = \''.$tahun.'-'.$bulan.'\') cuti,
                                 tbl_m_penggajian.pg_status,
-                                nvl((tbl_m_penggajian.pg_gaji_pokok + nvl(sum(tj_nilai),0)) - nvl(sum(txg_nilai),0),0)  gaji_total');
+                                nvl((tbl_m_penggajian.pg_gaji_pokok + nvl(sum(tj_nilai),0)) - nvl(sum(txg_nilai),0),0)  gaji_total, txp_status');
         $this->db->from('tbl_m_karyawan');
         $this->db->join('tbl_m_penggajian','tbl_m_karyawan.kry_no = tbl_m_penggajian.kry_no','left');
         $this->db->join('tbl_m_user','tbl_m_user.usr_username = tbl_m_karyawan.kry_no','left');
@@ -86,8 +115,8 @@ class Md_penggajian extends CI_Model
         $this->db->join('tbl_txn_potongan','tbl_txn_potongan.txp_id = tbl_txn_penggajian.txp_id','left');
         $this->db->join('tbl_m_potongan','tbl_m_potongan.tp_id = tbl_txn_potongan.tp_id','left');
         $this->db->where_not_in('usr_type','owner');
-        $this->db->or_like('DATE_FORMAT(NVL(txp_periode,SYSDATE()), \'%Y\')',$tahun,'after');
-        $this->db->or_like('DATE_FORMAT(NVL(txp_periode, SYSDATE()), \'%m\')',$bulan,'after');
+        $this->db->or_like('DATE_FORMAT(NVL(txp_periode,SYSDATE()), \'%Y-%m\')',$tahun.'-'.$bulan,'after');
+        $this->db->like('txp_periode','null');
         $this->db->group_by('tbl_txn_penggajian.txp_id,tbl_m_karyawan.kry_no');
         return $this->db->get();
     }
@@ -105,13 +134,39 @@ class Md_penggajian extends CI_Model
 
     public function gaji_total($userid)
     {
-        $this->db->select('nvl(nvl(sum(tj_nilai),0) + pg_gaji_pokok,0) as gaji_total');
+        $this->db->select('nvl(nvl(sum(tj_nilai),0) + pg_gaji_pokok,0) +  (
+            select nvl(sum(lbr_qty) * txp_nilai_lemburan,0) from tbl_txn_penggajian a, tbl_lemburan b
+            where a.kry_no = b.kry_no
+            AND DATE_FORMAT(nvl(txp_periode,SYSDATE()),\'%Y-%m\') = DATE_FORMAT(nvl(lbr_tanggal,SYSDATE()),\'%Y-%m\')
+            AND  a.kry_no = \''.$userid.'\'
+            group by a.kry_no, a.txp_id
+            ) - (
+                select NVL(sum(txg_nilai * txg_qty),0) from tbl_txn_penggajian a, tbl_txn_potongan b
+                where a.txp_id = b.txp_id
+                AND  a.kry_no = \''.$userid.'\'
+                group by a.kry_no, a.txp_id
+         ) 
+         as gaji_total,
+        (
+                select NVL(sum(txg_nilai * txg_qty),0) from tbl_txn_penggajian a, tbl_txn_potongan b
+                where a.txp_id = b.txp_id
+                AND  a.kry_no = \''.$userid.'\'
+                group by a.kry_no, a.txp_id
+         ) total_potongan,      
+         (
+            select nvl(sum(lbr_qty) * txp_nilai_lemburan,0) from tbl_txn_penggajian a, tbl_lemburan b
+            where a.kry_no = b.kry_no
+            AND DATE_FORMAT(nvl(txp_periode,SYSDATE()),\'%Y-%m\') = DATE_FORMAT(nvl(lbr_tanggal,SYSDATE()),\'%Y-%m\')
+            AND  a.kry_no = \''.$userid.'\'
+            group by a.kry_no, a.txp_id
+            ) total_lemburan');
         $this->db->from('tbl_m_karyawan');
         $this->db->join('tbl_m_penggajian','tbl_m_penggajian.kry_no = tbl_m_karyawan.kry_no','left');
         $this->db->join('tbl_txn_tunjangan','tbl_txn_tunjangan.kry_no = tbl_m_karyawan.kry_no','left');
         $this->db->where('tbl_m_karyawan.kry_no',$userid);
-        $this->db->group_by('tbl_m_karyawan.kry_no');
-        return $this->db->get();
+        $this->db->group_by('tbl_m_karyawan.kry_no,pg_gaji_pokok');
+        $query =  $this->db->get();
+        return $query;
     }
 
     public function insert_tunjangan($data)

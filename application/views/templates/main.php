@@ -164,10 +164,23 @@
           if(type == "pinjaman")
           {
             location.href =" <?php echo base_url('pinjaman/create?userid=') ?>"+$("input[name='user_id']").val();
+          } else if(type == "lemburan"){
+            location.href =" <?php echo base_url('lemburan/create?userid=') ?>"+$("input[name='user_id']").val();
           } else 
           {
             location.href =" <?php echo base_url('absensi/create?userid=') ?>"+$("input[name='user_id']").val();
           }
+      });
+
+      $("input[name='nilai_lembur']").keyup(function(){
+          var qty = $(this).attr('key');
+          var jumlah = parseInt($(this).val()) * parseInt(qty);
+          if(isNaN(jumlah))
+          {
+            jumlah = 0;
+          }
+          $("input[name='nilai_total_lembur']").val(jumlah);
+
       });
     </script>
 

@@ -9,6 +9,11 @@ class Md_potongan extends CI_Model
         $this->db->insert(self::$table_potongan, $data);
     }
 
+    public function insert_potongan($data)
+    {
+        $this->db->insert('tbl_txn_potongan', $data);
+    }
+
     public function update($data, $id)
     {
         $this->db->where('tp_id',$id);
@@ -68,5 +73,18 @@ class Md_potongan extends CI_Model
     {
         $this->db->where('tp_id',$id);
         $this->db->delete(self::$table_potongan);
+    }
+
+    public function check_id_potongan($id)
+    {
+        $this->db->where('txg_id',$id);
+        $query = $this->db->get('tbl_txn_potongan');
+        return ($query->num_rows() == 1) ? true : false;
+    }
+
+    public function deleted_potongan($id)
+    {
+        $this->db->where('txg_id',$id);
+        $this->db->delete('tbl_txn_potongan');
     }
 }

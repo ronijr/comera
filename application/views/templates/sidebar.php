@@ -64,9 +64,9 @@
             </a>
         </li>
         <li class="sidenav-item">
-            <a href="<?php echo base_url('penggajian/transaksi'); ?>" >
-                <span class="sidenav-icon icon icon-credit-card"></span>
-                <span class="sidenav-label">Penggajian</span>
+            <a href="<?php echo base_url('lemburan'); ?>">
+                <span class="sidenav-icon icon icon-list"></span>
+                <span class="sidenav-label">Lemburan</span>
             </a>
         </li>
         <li class="sidenav-item">
@@ -76,9 +76,9 @@
             </a>
         </li>
         <li class="sidenav-item">
-            <a href="#">
-                <span class="sidenav-icon icon icon-list"></span>
-                <span class="sidenav-label">Lemburan</span>
+            <a href="<?php echo base_url('penggajian/transaksi'); ?>" >
+                <span class="sidenav-icon icon icon-credit-card"></span>
+                <span class="sidenav-label">Penggajian</span>
             </a>
         </li>
         <li class="sidenav-heading">Laporan</li>

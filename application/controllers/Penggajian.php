@@ -10,6 +10,7 @@ class Penggajian extends CI_Controller {
         $this->load->model('md_penggajian');
         $this->load->model('md_tunjangan');
         $this->load->model('md_potongan');
+        $this->load->model('md_lemburan');
     }
 
     public function index()
@@ -175,10 +176,32 @@ class Penggajian extends CI_Controller {
 
     public function transaksi_create()
     {
-        $userid = $this->input->get('userid');
-        $pembayaran_id = $this->input->get('txpid');
-        $tahun = $this->input->get('tahun');
-        $bulan = $this->input->get('bulan');
+        $userid = (!(empty($puserid))) ? $puserid : $this->input->get('userid');
+        $pembayaran_id = (!(empty($txp_id))) ? $txp_id : $this->input->get('txpid');
+        $tahun = (!(empty($tahun))) ? $ptahun : $this->input->get('tahun');
+        $bulan = (!(empty($bulan))) ? $pbulan : $this->input->get('bulan');
+
+        $data['tahun'] = (empty($tahun)) ? date('Y') : $tahun;
+        $data['bulan'] = (empty($bulan)) ? date('m') : $bulan;
+        $data['title'] = 'Pembayaran Gaji Karyawan';
+        $data['karyawan'] = $this->md_penggajian->get_list_karyawan_byid2($userid, $data['tahun'].'-'.$data['bulan'].'-01')->result();
+        var_dump($data['karyawan']);
+        die();
+        $data['gaji_total'] = $this->md_penggajian->gaji_total($userid)->result();
+        $data['potongan'] = $this->md_potongan->get_data_level($data['karyawan'][0]->kry_jabatan_id)->result();
+        $data['potongans'] = $this->md_potongan->get_tunjangan_byuser($userid)->result();
+        $data['tunjangans'] = $this->md_tunjangan->get_tunjangan_byuser($userid)->result();
+        $data['lemburan'] = $this->md_lemburan->get_lemburan_byuser($userid)->result();
+        $data['txp_id']   = $pembayaran_id;
+        $this->template->load('penggajian/detail_transaksi',$data);
+    }
+
+    public function transaksi_create_($txp_id, $puserid, $ptahun, $pbulan)
+    {
+        $userid = (!(empty($puserid))) ? $puserid : $this->input->get('userid');
+        $pembayaran_id = (!(empty($txp_id))) ? $txp_id : $this->input->get('txpid');
+        $tahun = (!(empty($tahun))) ? $ptahun : $this->input->get('tahun');
+        $bulan = (!(empty($bulan))) ? $pbulan : $this->input->get('bulan');
 
         $data['tahun'] = (empty($tahun)) ? date('Y') : $tahun;
         $data['bulan'] = (empty($bulan)) ? date('m') : $bulan;
@@ -188,15 +211,26 @@ class Penggajian extends CI_Controller {
         $data['potongan'] = $this->md_potongan->get_data_level($data['karyawan'][0]->kry_jabatan_id)->result();
         $data['potongans'] = $this->md_potongan->get_tunjangan_byuser($userid)->result();
         $data['tunjangans'] = $this->md_tunjangan->get_tunjangan_byuser($userid)->result();
+        $data['lemburan'] = $this->md_lemburan->get_lemburan_byuser($userid)->result();
+        $data['txp_id']   = $pembayaran_id;
         $this->template->load('penggajian/detail_transaksi',$data);
     }
 
-    public function transaksi_docreate()
+
+
+    public function docreate_potongan()
     {
         $id     = $this->input->post('txp_id');
-        $userid = $this->input->post('userid');
+        $userid = $this->input->post('kry_no');
+        $tahun  = $this->input->post('tahun');
+        $bulan  = $this->input->post('bulan');
 
-        if(empty($id))
+        $tp_id = $this->input->post('potongan');
+        $nilai  = $this->input->post('nilai');
+        $jumlah = $this->input->post('jumlah');
+
+        $insert_id = $id;
+        if(empty($insert_id))
         {
             $kry_no     = $userid;
 
@@ -204,14 +238,140 @@ class Penggajian extends CI_Controller {
                 'kry_no' => $kry_no,
                 'txp_code' => $this->md_penggajian->get_code()->result()[0]->code
             ];
+            $insert_id = $this->md_penggajian->insert_transaksi($data);
+        } 
+            
+        $data_potongan = [
+            'txp_id' => $insert_id,
+            'tp_id'  => explode('|',$tp_id)[0],
+            'txg_qty' => $jumlah,
+            'txg_nilai' => $nilai
+        ];
+
+        $this->md_potongan->insert_potongan($data_potongan);
 
 
-            $this->md_penggajian->insert_transaksi($data);
+        $this->session->set_flashdata('success','Potongan Gaji berhasil ditambahkan');
+        redirect(base_url('penggajian/transaksi_create?userid='.$userid.'&txpid='.$insert_id.'&tahun='.$tahun.'&bulan='.$bulan.''));
+        
+    }
+
+    public function potongan_delete()
+    {
+        $id = (int)$this->input->post('id',TRUE);
+         if(! $this->md_potongan->check_id_potongan($id)){
+           $response=array(
+             'result' => 'error',
+             'msg'    => 'Data tidak ditemukan'
+           );
+         } else {
+           $this->md_potongan->deleted_potongan($id);
+           $response= array(
+             'result' => 'success_load',
+             'msg'    => 'Data berhasil dihapus'
+           );
+         }
+    
+         $this->output
+              ->set_content_type('application/json')
+              ->set_output(json_encode($response));
+    }
 
 
+    public function transaksi_docreate()
+    {
+            $config = array(
+                array(
+                        'field' => 'user_id',
+                        'label' => 'User Id',
+                        'rules' => 'required',
+                        'errors' => array(
+                            'required' => '%s tidak boleh kosong',
+                         ),
+                ),
+                array(
+                        'field' => 'tanggal_bayar',
+                        'label' => 'Tanggal Bayar',
+                        'rules' => 'required',
+                        'errors' => array(
+                            'required' => '%s tidak boleh kosong',
+                        ),
+                ),
+                array(
+                    'field' => 'tahun',
+                    'label' => 'Tahun',
+                    'rules' => 'required',
+                    'errors' => array(
+                        'required' => '%s tidak boleh kosong',
+                    ),
+                ),
+                array(
+                    'field' => 'bulan',
+                    'label' => 'Bulan',
+                    'rules' => 'required',
+                    'errors' => array(
+                        'required' => '%s tidak boleh kosong',
+                    ),
+                ),
+                array(
+                    'field' => 'status',
+                    'label' => 'Status',
+                    'rules' => 'required',
+                    'errors' => array(
+                        'required' => '%s tidak boleh kosong',
+                    ),
+                ),
+            );
 
-            $this->session->set_flashdata('success','Potongan Gaji berhasil ditambahkan');
-            redirect(base_url('penggajian/transaksi_create?/'.$kry_no.''));
+            $this->form_validation->set_rules($config);
+            $txp_id = $this->input->post('txp_id');
+
+            if($this->form_validation->run() === false)
+            {
+                $this->transaksi_create_($txp_id,$this->input->post('user_id'),$this->input->post('tahun'),$this->input->post('bulan'));
+            } else {
+
+               
+
+                if(empty($txp_id))
+                {
+                    $data = [
+                        'kry_no' => $this->input->post('user_id'),
+                        'txp_code' =>  $this->md_penggajian->get_code()->result()[0]->code,
+                        'txp_periode' => $this->input->post('tahun').'-'.$this->input->post('bulan').'-01',
+                        'txp_tanggal_bayar' => $this->input->post('tanggal_bayar'),
+                        'txp_gaji_total' => str_replace(',','',str_replace('Rp','',$this->input->post('gaji_total'))),
+                        'txp_potongan' => $this->input->post('total_potongan'),
+                        'txp_nilai_lemburan' => $this->input->post('nilai_total_lembur'),
+                        'txp_status' => $this->input->post('status'),
+                        'txp_created_at' => date('Y-m-d H:i:s'),
+                        'txp_updated_at' => date('Y-m-d H:i:s'),
+                        'txp_updated_by' => $this->session->userdata('data_user')[0]->kry_no,
+                        'txp_created_by' => $this->session->userdata('data_user')[0]->kry_no
+                    ];
+                    
+                    $this->md_penggajian->insert_potongan($data);
+            } else {
+                $data = [
+                    'kry_no' => $this->input->post('user_id'),
+                    'txp_code' =>  $this->md_penggajian->get_code()->result()[0]->code,
+                    'txp_periode' => $this->input->post('tahun').'-'.$this->input->post('bulan').'-01',
+                    'txp_tanggal_bayar' => $this->input->post('tanggal_bayar'),
+                    'txp_gaji_total' => str_replace(',','',str_replace('Rp','',$this->input->post('gaji_total'))),
+                    'txp_potongan' => $this->input->post('total_potongan'),
+                    'txp_nilai_lemburan' => $this->input->post('nilai_total_lembur'),
+                    'txp_status' => $this->input->post('status'),
+                    'txp_created_at' => date('Y-m-d H:i:s'),
+                    'txp_updated_at' => date('Y-m-d H:i:s'),
+                    'txp_updated_by' => $this->session->userdata('data_user')[0]->kry_no,
+                    'txp_created_by' => $this->session->userdata('data_user')[0]->kry_no
+                ];
+                
+                $this->md_penggajian->update_potongan($data,$txp_id);
+            }
+
+            $this->session->set_flashdata('success','Data berhasil disimpan');
+            redirect(base_url('penggajian/transaksi'));
         }
     }
 
