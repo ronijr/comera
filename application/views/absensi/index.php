@@ -1,6 +1,6 @@
 <div class="layout-content-body">
     <div class="title-bar">
-       
+        <?php if($this->session->userdata('data_user')[0]->usr_type == 'admin'): ?>
         <div class="title-bar-actions">
             <div class="btn-group dropdown">
                   <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown" type="button">
@@ -21,8 +21,9 @@
                             </a>
                         </li>
                     </ul>
-            </div>
+             </div>
         </div>
+        <?php endif; ?>
         <h1 class="title-bar-title">
             <span class="d-ib">Absensi Karyawan</span>
         </h1>
@@ -37,7 +38,7 @@
                 <?php echo $this->session->flashdata('warning'); ?>
         </div>
     <?php endif; ?>
-    <div class="row">
+    <!-- <div class="row">
         <div class="col-xs-12">
             <div class="panel">
                 <div class="panel-body">
@@ -45,7 +46,7 @@
                  </div>
              </div>
         </div>
-    </div>
+    </div> -->
     <div class="row">
     <div class="col-xs-12">
         <div class="panel">

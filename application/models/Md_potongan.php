@@ -59,13 +59,14 @@ class Md_potongan extends CI_Model
     }
 
 
-    public function get_tunjangan_byuser($userid)
+    public function get_tunjangan_byuser($userid,$periode)
     {
         $this->db->select('*');
         $this->db->from(self::$table_potongan);
         $this->db->join('tbl_txn_potongan','tbl_txn_potongan.tp_id = tbl_m_potongan.tp_id');
         $this->db->join('tbl_txn_penggajian','tbl_txn_penggajian.txp_id = tbl_txn_potongan.txp_id');
         $this->db->where('kry_no',$userid);
+        $this->db->like('txp_periode',$periode,'after');
         return $this->db->get();
     }
 

@@ -50,12 +50,13 @@ class Md_lemburan extends CI_Model
         return $this->db->get();
     }
 
-    public function get_lemburan_byuser($userid)
+    public function get_lemburan_byuser($userid,$periode)
     {
         $this->db->select('*');
         $this->db->from(self::$table_lemburan);
         $this->db->join('tbl_m_karyawan','tbl_m_karyawan.kry_no = tbl_lemburan.kry_no');
         $this->db->where('tbl_lemburan.kry_no',$userid);
+        $this->db->like('lbr_tanggal',$periode,'after');
         return $this->db->get();
     }
 

@@ -20,6 +20,9 @@ class Md_absensi extends CI_Model
         $this->db->select('*');
         $this->db->from(self::$table_absensi);
         $this->db->join('tbl_m_karyawan','tbl_absensi.kry_no = tbl_m_karyawan.kry_no');
+        if($this->session->userdata('data_user')[0]->usr_type == 'karyawan'){
+            $this->db->like('tbl_m_karyawan.kry_no',$this->session->userdata('data_user')[0]->kry_no);
+        }
         return $this->db->get();
     }
 

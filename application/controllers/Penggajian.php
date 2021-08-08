@@ -1,6 +1,6 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
-
+use Dompdf\Dompdf;
 class Penggajian extends CI_Controller {
 
     public function __construct()
@@ -170,6 +170,10 @@ class Penggajian extends CI_Controller {
         $data['tahun'] = (empty($tahun)) ? date('Y') : $tahun;
         $data['bulan'] = (empty($bulan)) ? date('m') : $bulan;
         $karyawan = $this->md_penggajian->get_list_karyawan_priode($data['tahun'], $data['bulan'] )->result();
+        if($this->session->userdata('data_user')[0]->usr_type == "karyawan")
+        {
+            $karyawan = $this->md_penggajian->get_list_karyawan_priode($data['tahun'], $data['bulan'] , $this->session->userdata('data_user')[0]->kry_no)->result();
+        } 
         $data['karyawan'] = $karyawan;
         $this->template->load('penggajian/transaksi',$data);
     }
@@ -184,14 +188,13 @@ class Penggajian extends CI_Controller {
         $data['tahun'] = (empty($tahun)) ? date('Y') : $tahun;
         $data['bulan'] = (empty($bulan)) ? date('m') : $bulan;
         $data['title'] = 'Pembayaran Gaji Karyawan';
-        $data['karyawan'] = $this->md_penggajian->get_list_karyawan_byid2($userid, $data['tahun'].'-'.$data['bulan'].'-01')->result();
-        var_dump($data['karyawan']);
-        die();
-        $data['gaji_total'] = $this->md_penggajian->gaji_total($userid)->result();
+        $data['karyawan'] = $this->md_penggajian->get_list_karyawan_byid($userid, $data['tahun'].'-'.$data['bulan'].'-01')->result();
+        $data['gaji_total'] = $this->md_penggajian->gaji_total($userid,$data['tahun'].'-'.$data['bulan'].'-01')->result();
         $data['potongan'] = $this->md_potongan->get_data_level($data['karyawan'][0]->kry_jabatan_id)->result();
-        $data['potongans'] = $this->md_potongan->get_tunjangan_byuser($userid)->result();
+        $data['potongans'] = $this->md_potongan->get_tunjangan_byuser($userid,$data['tahun'].'-'.$data['bulan'].'-01')->result();
         $data['tunjangans'] = $this->md_tunjangan->get_tunjangan_byuser($userid)->result();
-        $data['lemburan'] = $this->md_lemburan->get_lemburan_byuser($userid)->result();
+        $data['lemburan'] = $this->md_lemburan->get_lemburan_byuser($userid,$data['tahun'].'-'.$data['bulan'].'-01')->result();
+        $data['penggajian'] = $this->md_penggajian->get_txn_penggajian($pembayaran_id, $data['tahun'].'-'.$data['bulan'].'-01')->result();
         $data['txp_id']   = $pembayaran_id;
         $this->template->load('penggajian/detail_transaksi',$data);
     }
@@ -373,6 +376,32 @@ class Penggajian extends CI_Controller {
             $this->session->set_flashdata('success','Data berhasil disimpan');
             redirect(base_url('penggajian/transaksi'));
         }
+    }
+
+    public function laporan()
+    {
+        
+        $data['title'] = 'Laporan Gaji';
+        $this->template->load('penggajian/laporan/index',$data);
+    }
+
+    public function laporan_view()
+    {
+        $tahun  = $this->input->get('tahun');
+        $bulan  = $this->input->get('bulan');
+        $userid = $this->input->get('userid');
+
+        $data['penggajian'] =  $this->md_penggajian->get_list_karyawan_priode($tahun,$bulan, $userid)->result();
+        $data['tahun']      =  $tahun;
+        $data['bulan'] =  $bulan;
+        $pdifFilePath = "laporan-gaji-periode-".$tahun."-".$bulan;
+        $html = $this->load->view('penggajian/laporan/view',$data,true);
+
+        $dompdf = new Dompdf;
+        $dompdf->loadHtml($html);
+        $dompdf->setPaper('A4','landscape');
+        $dompdf->render();
+        $dompdf->stream($pdifFilePath.".pdf", array("Attachment" => 0));
     }
 
 }

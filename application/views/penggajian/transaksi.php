@@ -72,6 +72,7 @@
                             <th>Kehadiran</th>
                             <th>Gaji Pokok</th>
                             <th>Tunjangan</th>
+                            <th>Lemburan</th>
                             <th>Potongan</th>
                             <th>Gaji Total</th>
                             <th>Status</th>
@@ -102,8 +103,9 @@
                                     </td>
                                     <td>Rp<?php echo number_format($row->gaji_pokok); ?></td>
                                     <td>Rp<?php echo number_format($row->tunjangan); ?></td>
+                                    <td>Rp<?php echo number_format($this->md_penggajian->gaji_total($row->kry_no, $tahun.'-'.$bulan.'-01')->result()[0]->total_lemburan); ?></td>
                                     <td>Rp<?php echo number_format($row->potongan); ?></td>
-                                    <td>Rp<?php echo number_format($row->gaji_total); ?></td>
+                                    <td>Rp<?php echo number_format($this->md_penggajian->gaji_total($row->kry_no, $tahun.'-'.$bulan.'-01')->result()[0]->gaji_total )  ; ?></td>
                                     <td>
                                         <?php if($row->txp_status == 'Y'): ?>
                                          <span class="label label-success label-pill">Sudah Dibayar</span>
@@ -119,7 +121,13 @@
                                     <?php else: ?>
                                         <a href="<?php echo base_url('penggajian/transaksi_create?userid='.$row->kry_no.'&txpid='.$row->txp_id.'&tahun='.$tahun.'&bulan='.$bulan.''); ?>"  class="btn btn-sm btn-labeled arrow-right arrow-success"><span class="btn-label">
                                         <span class="icon icon-money icon-lg icon-fw"></span>
-                                        </span>Bayar</a>
+                                        </span>
+                                        <?php if($this->session->userdata('data_user')[0]->usr_type == 'karyawan'): ?>
+                                            Lihat
+                                        <?php else: ?>
+                                            Bayar
+                                        <?php endif; ?>
+                                    </a>
                                     <?php endif; ?>
                                 </td>
                                 </tr>

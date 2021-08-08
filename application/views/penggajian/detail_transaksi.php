@@ -1,7 +1,7 @@
 <div class="layout-content-body">
 		<div class="title-bar">
 			<div class="title-bar-actions">
-					<a href="<?php echo base_url('penggajian/transaksi'); ?>" class="btn btn-default">Kembali</a>
+					<a href="<?php echo base_url('penggajian/transaksi?tahun='.$tahun.'&bulan='.$bulan.''); ?>" class="btn btn-default">Kembali</a>
   		</div>
 			<h1 class="title-bar-title">
 				<span class="d-ib">Pembayaran Gaji Karyawan/Periode <?php echo date('F, Y',strtotime($tahun.'-'.$bulan.'-01')); ?></span>
@@ -159,7 +159,7 @@
                 <div class="form-group">
                     <label class="col-sm-2 control-label" for="form-control-6">&nbsp;</label>
                     <div class="col-sm-3  <?php if(form_error('nilai_lembur') != ""): ?> has-error has-feedback <?php endif; ?>" >
-                        <input id="form-control-1" class="form-control" key="<?php echo $sum_lembur; ?>" type="number" value="0" name="nilai_lembur">
+                        <input  <?php if(!in_array($this->session->userdata('data_user')[0]->usr_type,['admin'])): ?> readonly <?php endif;?> id="form-control-1" class="form-control" value="<?php echo (!empty($penggajian)) ? $penggajian[0]->txp_nilai_lemburan : 0 ?>" key="<?php echo $sum_lembur; ?>" type="number" name="nilai_lembur">
                         <?php if(form_error('nilai_lembur') != ""): ?>
                         <span class="form-control-feedback" aria-hidden="true">
                             <span class="icon icon-times"></span>
@@ -188,7 +188,9 @@
                                     <th>Nilai</th>
                                     <th>Jumlah</th>
                                     <th>Total</th>
-                                    <th style="width:50px;">Action</th>
+                                    <?php if(in_array($this->session->userdata('data_user')[0]->usr_type,['admin'])): ?>
+                                        <th style="width:50px;">Action</th>
+                                    <?php endif; ?>
                                 </tr>
                              </thead>
                              <tbody id="tunjangan_list">
@@ -200,7 +202,9 @@
                                         <td>Rp<?php echo number_format($row->tp_nilai);?> </td>
                                         <td><?php echo $row->txg_qty; ?></td>
                                         <td><?php echo number_format($row->tp_nilai * $row->txg_qty); ?></td>
+                                        <?php if(in_array($this->session->userdata('data_user')[0]->usr_type,['admin'])): ?>
                                         <td><a href="#" class="btn btn-sm btn-danger" onclick="delete_data('<?php echo $row->txg_id ?>', '<?php echo base_url('penggajian/potongan_delete'); ?>')">Hapus</a></td>
+                                        <?php endif; ?>
                                     </tr>
                                 <?php endforeach; ?>
                             </tbody>
@@ -208,7 +212,9 @@
                     </div>
                     <input type="hidden" name="total_potongan" value="<?php echo $total_potongan; ?>">
                     <div class="col-sm-2">
+                        <?php if(in_array($this->session->userdata('data_user')[0]->usr_type,['admin'])): ?>
                         <button  type="button" class="btn btn-sm btn-warning" data-toggle="modal" data-target="#exampleModal">Tambah Potongan</button>
+                        <?php endif; ?>
                     </div>
                 </div>
                 <div class="form-group">
@@ -226,7 +232,7 @@
                 <div class="form-group">
                     <label class="col-sm-2 control-label" for="form-control-1">Tanggal Bayar</label>
                     <div class="col-sm-4 <?php if(form_error('tanggal_bayar') != ""): ?> has-error has-feedback <?php endif; ?>">
-                        <input id="form-control-1" class="form-control" type="date" name="tanggal_bayar" value="<?php echo set_value('tanggal_bayar'); ?>">
+                        <input <?php if(!in_array($this->session->userdata('data_user')[0]->usr_type,['admin'])): ?> readonly <?php endif;?> id="form-control-1" class="form-control" type="date" name="tanggal_bayar" value="<?php echo  (!empty($penggajian)) ? $penggajian[0]->txp_tanggal_bayar : set_value('tanggal_bayar'); ?>">
                         <?php if(form_error('tanggal_bayar') != ""): ?>
                         <span class="form-control-feedback" aria-hidden="true">
                             <span class="icon icon-times"></span>
@@ -276,6 +282,7 @@
                         <?php endif; ?>
                     </div>
                 </div>
+                <?php if(in_array($this->session->userdata('data_user')[0]->usr_type,['owner','manager'])): ?>
                 <div class="form-group">
                     <label class="col-sm-2 control-label" for="form-control-6">Status</label>
                     <div class="col-sm-6 <?php if(form_error('status') != ""): ?> has-error has-feedback <?php endif; ?>">
@@ -284,7 +291,8 @@
                         <?php
                             foreach(get_type_status_bayar() as $key => $value)
                             {
-                              $val = (set_value('status') == '' ) ? $karyawan[0]->pg_status : set_value('status'); 
+                              $status = (!empty($penggajian)) ? $penggajian[0]->txp_status : '';
+                              $val = (set_value('status') == '' ) ? $status : set_value('status'); 
                               $selected = ($val == $key) ? 'selected' : '';
                               echo '<option value='.$key.' '.$selected.'>'.$value.'</option>';
                             }
@@ -298,10 +306,13 @@
                         <?php endif; ?>
                     </div>
                 </div>
+                <?php endif; ?>
                 <div class="form-group">
                     <label class="col-sm-2 control-label" for="form-control-6">&nbsp;</label>
                     <div class="col-sm-4">
-                                 <button class="btn btn-primary" type="submit" style="margin-right:10px;">Simpan</button>
+                        <?php if(in_array($this->session->userdata('data_user')[0]->usr_type,['admin','owner','manager'])): ?>
+                           <button class="btn btn-primary" type="submit" style="margin-right:10px;">Simpan</button>
+                        <?php endif; ?>
                     </div>
                 </div>
                 <?php echo form_close(); ?>

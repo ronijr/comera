@@ -59,4 +59,21 @@ class Template {
 		// parsing array(header,menu,content,footer) ke sebuah file menggunakan library parser CI
 		$this->CI->parser->parse("templates/main", $data);
 	}
+
+	public function loadPDF($html,$filename="", $stream=TRUE, $paper = 'A4', $orientation = "landscape") {
+		define('DOMPDF_ENABLE_AUTOLOAD', false);
+		define("DOMPDF_ENABLE_REMOTE", false);
+	    require_once("./vendor/dompdf/dompdf/dompdf_config.inc.php");
+
+	    $dompdf = new DOMPDF();
+		$dompdf->set_option('enable_html5_parser', TRUE);
+	    $dompdf->load_html($html);
+		$dompdf->set_paper($paper, $orientation);
+	    $dompdf->render();
+		// 	if ($stream) {
+        // $dompdf->stream($filename.".pdf", array("Attachment" => 0));
+	    // } else {
+	    //     return $dompdf->output();
+	    // }
+	}
 }

@@ -174,6 +174,7 @@
 
       $("input[name='nilai_lembur']").keyup(function(){
           var qty = $(this).attr('key');
+          console.log
           var jumlah = parseInt($(this).val()) * parseInt(qty);
           if(isNaN(jumlah))
           {
@@ -181,6 +182,17 @@
           }
           $("input[name='nilai_total_lembur']").val(jumlah);
 
+      });
+
+      $(document).ready(function(){
+        var qty = $("input[name='nilai_lembur']").attr('key');
+          console.log
+          var jumlah = parseInt($("input[name='nilai_lembur']").val()) * parseInt(qty);
+          if(isNaN(jumlah))
+          {
+            jumlah = 0;
+          }
+          $("input[name='nilai_total_lembur']").val(jumlah);
       });
     </script>
 

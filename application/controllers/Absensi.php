@@ -256,4 +256,10 @@ class Absensi extends CI_Controller {
         }
 
     }
+
+    public function laporan()
+    {
+        $data['title'] = 'Laporan Absen';
+        $this->template->load('absensi/laporan/index',$data);
+    }
 }
