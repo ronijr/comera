@@ -404,4 +404,26 @@ class Penggajian extends CI_Controller {
         $dompdf->stream($pdifFilePath.".pdf", array("Attachment" => 0));
     }
 
+    public function slip_gaji()
+    {
+        $tahun  = $this->input->get('tahun');
+        $bulan  = $this->input->get('bulan');
+        $userid = $this->input->get('userid');
+        $txp_id = $this->input->get('txp_id');
+
+
+        $data['title'] = 'Slip Gaji';
+        $data['karyawan'] = $this->md_penggajian->get_list_karyawan_byid($userid, $tahun.'-'.$bulan.'-01')->result();
+        $data['gaji_total'] = $this->md_penggajian->gaji_total($userid, $tahun.'-'. $bulan.'-01')->result();
+        $data['penggajian'] = $this->md_penggajian->get_txn_penggajian($txp_id, $tahun.'-'.$bulan.'-01')->result();
+        $html = $this->load->view('penggajian/laporan/slip_gaji',$data,true);
+
+        $pdifFilePath = "slip_gaji_".$userid."_".$tahun."".$bulan;
+        $dompdf = new Dompdf;
+        $dompdf->loadHtml($html);
+        $dompdf->setPaper('A4','landscape');
+        $dompdf->render();
+        $dompdf->stream($pdifFilePath.".pdf", array("Attachment" => 0));
+    }
+
 }

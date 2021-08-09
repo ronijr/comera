@@ -54,6 +54,9 @@ class Md_penggajian extends CI_Model
                                 tbl_m_karyawan.kry_jabatan, 
                                 tbl_m_karyawan.kry_dept_nama,
                                 tbl_m_karyawan.kry_jabatan_id,
+                                tbl_m_karyawan.kry_no_rekening,
+                                tbl_m_karyawan.kry_bank,
+                                tbl_m_karyawan.kry_nama_rekening,
                                 nvl(tbl_m_penggajian.pg_id,0) pg_id,
                                 nvl(tbl_m_penggajian.pg_gaji_pokok,0) pg_gaji_pokok,
                                 tbl_m_penggajian.pg_status');
@@ -225,6 +228,7 @@ class Md_penggajian extends CI_Model
                 group by a.kry_no, a.txp_id
             ),nvl(sum(tj_nilai),0) + pg_gaji_pokok)
          as gaji_total,
+         nvl(sum(tj_nilai),0) total_tunjangan,
         (
                 select NVL(sum(txg_nilai * txg_qty),0) from tbl_txn_penggajian a, tbl_txn_potongan b
                 where a.txp_id = b.txp_id

@@ -2,7 +2,10 @@
 		<div class="title-bar">
 			<div class="title-bar-actions">
 					<a href="<?php echo base_url('penggajian/transaksi?tahun='.$tahun.'&bulan='.$bulan.''); ?>" class="btn btn-default">Kembali</a>
-  		</div>
+                    <?php if($txp_id != 0): ?>
+					<a href="<?php echo base_url('penggajian/slip_gaji?userid='.$karyawan[0]->kry_no.'&txp_id='.$txp_id.'&tahun='.$tahun.'&bulan='.$bulan.''); ?>" class="btn btn-info">Slip Gaji</a>
+                    <?php endif; ?>
+                </div>
 			<h1 class="title-bar-title">
 				<span class="d-ib">Pembayaran Gaji Karyawan/Periode <?php echo date('F, Y',strtotime($tahun.'-'.$bulan.'-01')); ?></span>
 			</h1>
