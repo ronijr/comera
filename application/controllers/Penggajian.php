@@ -209,12 +209,13 @@ class Penggajian extends CI_Controller {
         $data['tahun'] = (empty($tahun)) ? date('Y') : $tahun;
         $data['bulan'] = (empty($bulan)) ? date('m') : $bulan;
         $data['title'] = 'Pembayaran Gaji Karyawan';
-        $data['karyawan'] = $this->md_penggajian->get_list_karyawan_byid($userid)->result();
-        $data['gaji_total'] = $this->md_penggajian->gaji_total($userid)->result();
+        $data['karyawan'] = $this->md_penggajian->get_list_karyawan_byid($userid, $data['tahun'].'-'.$data['bulan'].'-01')->result();
+        $data['gaji_total'] = $this->md_penggajian->gaji_total($userid,$data['tahun'].'-'.$data['bulan'].'-01')->result();
         $data['potongan'] = $this->md_potongan->get_data_level($data['karyawan'][0]->kry_jabatan_id)->result();
-        $data['potongans'] = $this->md_potongan->get_tunjangan_byuser($userid)->result();
+        $data['potongans'] = $this->md_potongan->get_tunjangan_byuser($userid,$data['tahun'].'-'.$data['bulan'].'-01')->result();
         $data['tunjangans'] = $this->md_tunjangan->get_tunjangan_byuser($userid)->result();
-        $data['lemburan'] = $this->md_lemburan->get_lemburan_byuser($userid)->result();
+        $data['lemburan'] = $this->md_lemburan->get_lemburan_byuser($userid,$data['tahun'].'-'.$data['bulan'].'-01')->result();
+        $data['penggajian'] = $this->md_penggajian->get_txn_penggajian($pembayaran_id, $data['tahun'].'-'.$data['bulan'].'-01')->result();
         $data['txp_id']   = $pembayaran_id;
         $this->template->load('penggajian/detail_transaksi',$data);
     }
