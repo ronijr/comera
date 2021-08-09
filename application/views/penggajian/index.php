@@ -1,28 +1,7 @@
 <div class="layout-content-body">
     <div class="title-bar">
        
-        <div class="title-bar-actions">
-            <div class="btn-group dropdown">
-                  <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown" type="button">
-		            Actions
-		            <span class="icon icon-ellipsis-h icon-lg icon-fw"></span>
-		          </button>
-                  <ul class="dropdown-menu dropdown-menu-right">
-                        <li>
-                            <a href="<?php echo base_url('absensi/create'); ?>">
-                                <div class="media">
-                                <div class="media-left">
-                                    <span class="icon icon-plus icon-lg icon-fw"></span>
-                                </div>
-                                <div class="media-body">
-                                    <span class="d-b">Tambah Data</span>
-                                </div>
-                                </div>
-                            </a>
-                        </li>
-                    </ul>
-            </div>
-        </div>
+       
         <h1 class="title-bar-title">
             <span class="d-ib">Gaji Karyawan</span>
         </h1>

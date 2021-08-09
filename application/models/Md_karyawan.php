@@ -51,10 +51,22 @@ class Md_karyawan extends CI_Model
         return ($query->num_rows() == 1) ? true : false;
     }
 
+    public function deleted($id)
+    {
+        $this->db->where('kry_id',$id);
+        $this->db->delete(self::$table_karyawan);
+    }
+
+    public function deleted_user($userid)
+    {
+        $this->db->where('usr_username',$userid);
+        $this->db->delete('tbl_m_user');
+    }
+
 
      //Dapatkan data karyawan berdasarkan user id
-     public function get_by_userid($id)
-     {
+    public function get_by_userid($id)
+    {
          $this->db->select('*');
          $this->db->from(self::$table_karyawan);
          $this->db->join('tbl_m_user','tbl_m_karyawan.kry_no = tbl_m_user.usr_username');

@@ -24,7 +24,7 @@ class Penggajian extends CI_Controller {
     {
         $data['title'] = 'Detail Gaji Karyawan';
         $data['karyawan'] = $this->md_penggajian->get_list_karyawan_byid($userid)->result();
-        $data['gaji_total'] = $this->md_penggajian->gaji_total($userid)->result();
+        $data['gaji_total'] = $this->md_penggajian->gaji_total($userid,'')->result();
         $data['tunjangan'] = $this->md_tunjangan->get_data_level($data['karyawan'][0]->kry_jabatan_id)->result();
         $data['tunjangans'] = $this->md_tunjangan->get_tunjangan_byuser($userid)->result();
         $this->template->load('penggajian/detail',$data);

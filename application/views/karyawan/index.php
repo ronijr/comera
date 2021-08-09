@@ -87,7 +87,9 @@
                             </button>
                             <ul class="dropdown-menu dropdown-menu-right">
                             <li><a href="<?php echo base_url('karyawan/update/'.$row->kry_id.''); ?>">Edit</a></li>
-                            <li><a href="#" onclick="delete_data('<?php echo $row->kry_id ?>', '<?php echo base_url('karyawan/deleted'); ?>')">Hapus</a></li>
+                            <?php if($row->kry_no != $this->session->userdata('data_user')[0]->kry_no): ?>
+                              <li><a href="#" onclick="delete_data('<?php echo $row->kry_id ?>', '<?php echo base_url('karyawan/deleted/'.$row->kry_no.''); ?>')">Hapus</a></li>
+                            <?php endif; ?>
                             </ul>
                         </div>
                     </td>

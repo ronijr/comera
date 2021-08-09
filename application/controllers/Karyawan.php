@@ -523,12 +523,35 @@ class Karyawan extends CI_Controller {
                         'usr_type'      => $hak_akses,
                 ];
 
-                $this->md_users->update($data_user, $id);
+                $this->md_users->update($data_user, $code);
                 $this->md_karyawan->update($data, $id);
 
                 $this->session->set_flashdata('success', 'Data berhasil diubah.');
                 redirect(base_url('karyawan/update/'.$id.''));
         }
+    }
+
+
+    public function deleted($userid)
+    {
+         $id = (int)$this->input->post('id',TRUE);
+         if(! $this->md_karyawan->check_id($id)){
+           $response=array(
+             'result' => 'error',
+             'msg'    => 'Karyawan tidak ditemukan'
+           );
+         } else {
+           $this->md_karyawan->deleted($id);
+           $this->md_karyawan->deleted_user($userid);
+           $response= array(
+             'result' => 'success_load',
+             'msg'    => 'Data berhasil dihapus'
+           );
+         }
+    
+         $this->output
+              ->set_content_type('application/json')
+              ->set_output(json_encode($response));
     }
 
 }

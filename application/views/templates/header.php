@@ -1,8 +1,9 @@
 <div class="navbar navbar-default">
     <div class="navbar-header">
-        <a class="navbar-brand navbar-brand-center" href="<?php echo base_url('dashboard'); ?>">
-        <!-- <img class="navbar-brand-logo" src="<?php echo base_url(); ?>/assets/img/logo-inverse.svg" alt="Elephant"> -->
-        Comera
+    
+        <a style="color:#fff; font-weight:bold;" class="navbar-brand navbar-brand-center" href="<?php echo base_url('dashboard'); ?>">
+        <img style="width:100;margin-left:-65px; margin-right:5px; display:inline; height:40px; margin-top:-10px;" class="navbar-brand-logo" src="<?php echo base_url(); ?>/assets/img/logo_2.png" alt="Comera">
+        CV COMERA    
         </a>
         <button class="navbar-toggler visible-xs-block collapsed" type="button" data-toggle="collapse" data-target="#sidenav">
         <span class="sr-only">Toggle navigation</span>

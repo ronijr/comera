@@ -145,6 +145,7 @@
                         <?php endif; ?>
                     </div>
                 </div>
+                <?php if(in_array($this->session->userdata('data_user')[0]->usr_type,['owner','manager'])): ?>
                 <div class="form-group">
                     <label class="col-sm-2 control-label" for="form-control-6">Status</label>
                     <div class="col-sm-6 <?php if(form_error('status') != ""): ?> has-error has-feedback <?php endif; ?>">
@@ -167,6 +168,7 @@
                         <?php endif; ?>
                     </div>
                 </div>
+                <?php endif; ?>
                 <div class="form-group">
                     <label class="col-sm-2 control-label" for="form-control-6">&nbsp;</label>
                     <div class="col-sm-4">
