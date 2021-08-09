@@ -122,7 +122,7 @@
         <?php endif; ?>
         <?php if(in_array($this->session->userdata('data_user')[0]->usr_type,['admin','manager','owner'])): ?>
         <li class="sidenav-item">
-            <a href="#">
+            <a href="<?php echo base_url('pinjaman/laporan'); ?>">
                 <span class="sidenav-icon icon icon-info-circle"></span>
                 <span class="sidenav-label">Laporan Pinjaman</span>
             </a>

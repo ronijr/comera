@@ -167,4 +167,31 @@ class Md_pinjaman extends CI_Model
         }
         return $qty;
     }
+
+    public function get_pinjaman_by_user($userid)
+    {
+
+        $this->db->select('
+                tbl_m_karyawan.kry_no,
+                tbl_m_karyawan.kry_nama,
+                tbl_m_karyawan.kry_jabatan,
+                tbl_m_karyawan.kry_dept_nama,
+                tbl_m_karyawan.kry_image,
+                tbl_txn_pinjaman.txj_id,
+                tbl_txn_pinjaman.txj_parent_id,
+                tbl_txn_pinjaman.txj_code,
+                tbl_txn_pinjaman.txj_tanggal_pinjam,
+                tbl_txn_pinjaman.txj_nilai_pinjam,
+                tbl_txn_pinjaman.txj_tanggal_bayar,
+                tbl_txn_pinjaman.txj_nilai_bayar,
+                tbl_txn_pinjaman.txj_jatuh_tempo,
+                tbl_txn_pinjaman.txj_deskripsi,
+        ');
+        $this->db->from('tbl_txn_pinjaman');
+        $this->db->join('tbl_m_karyawan','tbl_m_karyawan.kry_no = tbl_txn_pinjaman.kry_no');
+        $this->db->like('tbl_m_karyawan.kry_no',$userid,'after');
+        $this->db->where('tbl_txn_pinjaman.txj_parent_id',0);
+        $this->db->order_by('tbl_m_karyawan.kry_no','asc');
+        return $this->db->get();
+    }
 }

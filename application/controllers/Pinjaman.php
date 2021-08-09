@@ -1,6 +1,7 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
+use Dompdf\Dompdf;
 class Pinjaman extends CI_Controller {
 
     public function __construct()
@@ -400,5 +401,30 @@ class Pinjaman extends CI_Controller {
          $this->output
               ->set_content_type('application/json')
               ->set_output(json_encode($response));
+    }
+
+    public function laporan()
+    {
+        $data['title'] = 'Laporan Pinjaman';
+        $this->template->load('pinjaman/laporan/index',$data);
+
+        
+    }
+
+    public function laporan_view()
+    {
+       
+        $userid = $this->input->get('userid');
+
+        $data['title'] = 'Laporan Pinjaman';
+        $data['pinjaman'] = $this->md_pinjaman->get_pinjaman_by_user($userid)->result();
+        $html = $this->load->view('pinjaman/laporan/view',$data,true);
+
+        $pdifFilePath = "laporan-pinjaman";
+        $dompdf = new Dompdf;
+        $dompdf->loadHtml($html);
+        $dompdf->setPaper('A4','landscape');
+        $dompdf->render();
+        $dompdf->stream($pdifFilePath.".pdf", array("Attachment" => 0));
     }
 }

@@ -1,6 +1,6 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
-
+use Dompdf\Dompdf;
 class Absensi extends CI_Controller {
 
     public function __construct()
@@ -261,5 +261,26 @@ class Absensi extends CI_Controller {
     {
         $data['title'] = 'Laporan Absen';
         $this->template->load('absensi/laporan/index',$data);
+    }
+
+    public function laporan_view()
+    {
+    
+        $s_date = $this->input->get('s_date');
+        $e_date = $this->input->get('e_date');
+        $userid = $this->input->get('userid');
+
+        $data['s_date']  = $s_date;
+        $data['e_date']  = $e_date;
+        $data['userid']  = $userid;
+        $data['absensi'] = $this->md_absensi->get_absen_karyawan( $userid,$s_date,$e_date)->result();
+        $html = $this->load->view('absensi/laporan/view',$data,true);
+
+        $pdifFilePath = "laporan-absensi";
+        $dompdf = new Dompdf;
+        $dompdf->loadHtml($html);
+        $dompdf->setPaper('A4','landscape');
+        $dompdf->render();
+        $dompdf->stream($pdifFilePath.".pdf", array("Attachment" => 0));
     }
 }

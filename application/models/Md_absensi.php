@@ -52,4 +52,37 @@ class Md_absensi extends CI_Model
         return $query->num_rows();
     }
 
+    public function get_sub_q_status($userid, $date, $status)
+    {
+        $this->db->select('count(*)');
+        $this->db->from(self::$table_absensi);
+        $this->db->where('kry_no ='.$userid.'');
+        $this->db->where('abs_tanggal ='.$date.'');
+        $this->db->where('abs_status',$status);
+        return $this->db->get_compiled_select();
+    }
+    public function get_absen_karyawan($userid, $s_date, $e_date)
+    {
+
+        $this->db->select('tbl_absensi.abs_tanggal,
+            tbl_m_karyawan.kry_no,
+            tbl_m_karyawan.kry_nama,
+            tbl_m_karyawan.kry_jabatan,
+            tbl_m_karyawan.kry_dept_nama,
+            ('.$this->get_sub_q_status('tbl_m_karyawan.kry_no','tbl_absensi.abs_tanggal','H').') hadir,
+            ('.$this->get_sub_q_status('tbl_m_karyawan.kry_no','tbl_absensi.abs_tanggal','S').') sakit,
+            ('.$this->get_sub_q_status('tbl_m_karyawan.kry_no','tbl_absensi.abs_tanggal','I').') ijin,
+            ('.$this->get_sub_q_status('tbl_m_karyawan.kry_no','tbl_absensi.abs_tanggal','A').') alpa,
+            ('.$this->get_sub_q_status('tbl_m_karyawan.kry_no','tbl_absensi.abs_tanggal','C').') cuti
+            ');
+        $this->db->from(self::$table_absensi);
+        $this->db->join('tbl_m_karyawan','tbl_absensi.kry_no = tbl_m_karyawan.kry_no','left');
+        $this->db->where('abs_tanggal >=',$s_date);
+        $this->db->where('abs_tanggal <=',$e_date);
+        $this->db->like('tbl_m_karyawan.kry_no',$userid,'after');
+        $this->db->group_by('tbl_m_karyawan.kry_no,  tbl_m_karyawan.kry_nama, tbl_m_karyawan.kry_nama, tbl_m_karyawan.kry_dept_nama,tbl_absensi.abs_tanggal');
+        $this->db->order_by('tbl_absensi.abs_tanggal,tbl_m_karyawan.kry_no,  tbl_m_karyawan.kry_nama','asc');
+        return $this->db->get();
+    }
+
 }

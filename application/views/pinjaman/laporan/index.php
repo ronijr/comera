@@ -1,7 +1,7 @@
 <div class="layout-content-body">
     <div class="title-bar">
         <h1 class="title-bar-title">
-            <span class="d-ib">Laporan Absensi</span>
+            <span class="d-ib">Laporan Pinjaman</span>
         </h1>
     </div>
 
@@ -15,19 +15,7 @@
         </div>
     <?php endif; ?>
     <div class="demo-form-wrapper">
-        <form class="form form-horizontal" type="GET" action="<?php echo base_url('absensi/laporan_view'); ?>">
-            <div class="form-group">
-                <label for="email-2" class="col-sm-3 col-md-4 control-label">Dari Tanggal</label>
-                    <div class="col-sm-6 col-md-4">
-                        <input type="date" name="s_date" value ="<?php echo (set_value('s_date') == '') ? date('Y-m-d') : set_value('s_date'); ?>" class="form-control">
-                    </div>
-            </div>
-            <div class="form-group">
-                <label for="email-2" class="col-sm-3 col-md-4 control-label">Sampai Tanggal</label>
-                    <div class="col-sm-6 col-md-4">
-                        <input type="date" name="e_date" value ="<?php echo (set_value('s_date') == '') ? date('Y-m-d') : set_value('s_date'); ?>" class="form-control">
-                    </div>
-            </div>
+        <form class="form form-horizontal" type="GET" action="<?php echo base_url('pinjaman/laporan_view'); ?>">
             <div class="form-group">
                 <label for="password-2" class="col-sm-3 col-md-4 control-label">User ID (Optional)</label>
                 <div class="col-sm-6 col-md-4">

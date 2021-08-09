@@ -56,13 +56,14 @@
                 </tr>
                 
             <?php endforeach; ?>
-                <tfoot>
+               
+        </tbody>
+        <tfoot>
                     <tr>
                         <td colspan="11">Sub Total</td>
                         <td style="text-align:right;"><?php echo number_format($gaji_total); ?></td>
                     </tr>
-                </tfoot>
-        </tbody>
+      </tfoot>
     </table>
 </body>
 </html>
