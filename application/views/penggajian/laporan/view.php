@@ -45,7 +45,7 @@
                     <td><?php echo $row->kry_nama; ?>
                     <td><?php echo $row->kry_jabatan; ?>
                     <td><?php echo $row->kry_dept_nama; ?>
-                    <td><?php echo $row->kry_dept_nama; ?>
+                    <td><?php echo "Hadir : ".$row->hadir."<br> Sakit : ".$row->sakit."<br> Ijin : ".$row->ijin."<br> Alpa : ".$row->alpa."<br> Cuti : ".$row->cuti; ?>
                     <td><?php echo $tahun.'/'.$bulan; ?>
                     <td><?php echo ($row->txp_status == 'Y') ? 'Sudah Dibayar' : 'Belum Dibayar'; ?></td>
                     <td style="text-align:right;"><?php echo number_format($row->gaji_pokok); ?>

@@ -130,8 +130,8 @@ class Tunjangan extends CI_Controller {
                      ),
             ),
             array(
-                    'field' => 'Nilai',
-                    'label' => 'Jumlah Tunjangan',
+                    'field' => 'jumlah',
+                    'label' => 'Nilai',
                     'rules' => 'required|numeric',
                     'errors' => array(
                             'required' => '%s tidak boleh kosong',
@@ -150,7 +150,7 @@ class Tunjangan extends CI_Controller {
 
         $this->form_validation->set_rules($config);
         if($this->form_validation->run() === false)
-        {
+        {   
             $this->update($id);
         } else {
 
@@ -167,6 +167,7 @@ class Tunjangan extends CI_Controller {
                 'tj_updated_at' => date('Y-m-d H:i:s'),
                 'tj_updated_by' => $this->session->userdata('data_user')[0]->kry_no
             ];
+           
 
             $this->md_tunjangan->update($data,$id);
             $this->session->set_flashdata('success','Data berhasil diubah.');

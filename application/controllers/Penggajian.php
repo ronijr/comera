@@ -64,7 +64,7 @@ class Penggajian extends CI_Controller {
                 $data = [
                     'kry_no' => $kry_no,
                     'kry_nama' => $kry_nama,
-                    'pg_status' =>$status,
+                    'pg_status' => (!empty($status)) ? $status : '',
                     'pg_gaji_pokok' => $gaji_pokok,
                     'pg_created_at' => $created_at,
                     'pg_created_by' => $created_by
@@ -97,7 +97,7 @@ class Penggajian extends CI_Controller {
                 $kry_no = $userid;
                 $kry_nama = $this->input->post('name');
                 $gaji_pokok = $this->input->post('gaji_pokok');
-                $status = $this->input->post('status');
+                $status = (!empty($this->input->post('status'))) ? $this->input->post('status') : '';
                 $updated_at = date('Y-m-d H:i:s');
                 $updated_by = $this->session->userdata('data_user')[0]->kry_no;
 
@@ -354,7 +354,7 @@ class Penggajian extends CI_Controller {
                         'txp_created_by' => $this->session->userdata('data_user')[0]->kry_no
                     ];
                     
-                    $this->md_penggajian->insert_potongan($data);
+                    $this->md_penggajian->insert_transaksi($data);
             } else {
                 $data = [
                     'kry_no' => $this->input->post('user_id'),
