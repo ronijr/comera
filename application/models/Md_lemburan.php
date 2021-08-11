@@ -56,7 +56,7 @@ class Md_lemburan extends CI_Model
         $this->db->from(self::$table_lemburan);
         $this->db->join('tbl_m_karyawan','tbl_m_karyawan.kry_no = tbl_lemburan.kry_no');
         $this->db->where('tbl_lemburan.kry_no',$userid);
-        $this->db->like('lbr_tanggal',$periode,'after');
+        $this->db->like('DATE_FORMAT(lbr_tanggal,\'%Y-%m\')',$periode,'after');
         return $this->db->get();
     }
 
