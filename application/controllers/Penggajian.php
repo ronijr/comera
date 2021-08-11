@@ -193,7 +193,7 @@ class Penggajian extends CI_Controller {
         $data['potongan'] = $this->md_potongan->get_data_level($data['karyawan'][0]->kry_jabatan_id)->result();
         $data['potongans'] = $this->md_potongan->get_tunjangan_byuser($userid,$data['tahun'].'-'.$data['bulan'].'-01')->result();
         $data['tunjangans'] = $this->md_tunjangan->get_tunjangan_byuser($userid)->result();
-        $data['lemburan'] = $this->md_lemburan->get_lemburan_byuser($userid,$data['tahun'].'-'.$data['bulan'].'-01')->result();
+        $data['lemburan'] = $this->md_lemburan->get_lemburan_byuser($userid,$data['tahun'].'-'.$data['bulan'].'')->result();
         $data['penggajian'] = $this->md_penggajian->get_txn_penggajian($pembayaran_id, $data['tahun'].'-'.$data['bulan'].'-01')->result();
         $data['txp_id']   = $pembayaran_id;
         $this->template->load('penggajian/detail_transaksi',$data);
