@@ -28,7 +28,7 @@
             </a>
         </li>
         <?php endif; ?>
-        <?php if(in_array($this->session->userdata('data_user')[0]->usr_type,['admin'])): ?>
+        <?php if(in_array($this->session->userdata('data_user')[0]->usr_type,['admin','owner','manager'])): ?>
         <li class="sidenav-item">
             <a href="<?php echo base_url('penggajian'); ?>">
                 <span class="sidenav-icon icon icon-th"></span>
