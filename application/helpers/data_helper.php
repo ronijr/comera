@@ -229,6 +229,7 @@ if ( ! function_exists('get_status_absen'))
                 break;
             case "C": 
                 $result =  '<span class="label label-warning">Cuti</span>';
+                break;
             default: 
                 $result =  '<span class="label label-danger">Alpa</span>';
                 break;

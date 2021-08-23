@@ -127,7 +127,7 @@ class Md_penggajian extends CI_Model
 
     public function get_sub_nilai_potongan($userid, $tahun, $bulan)
     {
-        $this->db->select('nvl(sum(txg_nilai),0)');
+        $this->db->select('nvl(sum(txg_nilai) * 2,0)');
         $this->db->from('tbl_txn_penggajian');
         $this->db->join('tbl_txn_potongan','tbl_txn_potongan.txp_id = tbl_txn_penggajian.txp_id','left');
         $this->db->join('tbl_m_potongan','tbl_m_potongan.tp_id = tbl_txn_potongan.tp_id','left');

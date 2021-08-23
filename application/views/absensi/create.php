@@ -146,12 +146,14 @@
                       </p>
                     </div>
                 </div>
+                <?php if($this->session->userdata('data_user')[0]->us_type == 'admin'): ?>
                 <div class="form-group">
                     <label class="col-sm-2 control-label" for="form-control-6">&nbsp;</label>
                     <div class="col-sm-6">
                      <button class="btn btn-primary" type="submit">Simpan</button>
                     </div>
                 </div>
+                <?php endif; ?>
                 <?php echo form_close(); ?>
             </div>
           </div> <!-- !. card body -->

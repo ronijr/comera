@@ -92,7 +92,11 @@
                 <div class="form-group">
                     <label class="col-sm-2 control-label" for="form-control-1">Tanggal</label>
                     <div class="col-sm-6  <?php if(form_error('tanggal') != ""): ?> has-error has-feedback <?php endif; ?>" >
-                        <input id="form-control-1" class="form-control" type="date" value="<?php echo (set_value('tanggal') != "") ? set_value('tanggal') : $absensi[0]->abs_tanggal; ?>" name="tanggal">
+                        <input id="form-control-1"
+                        <?php if($this->session->userdata('data_user')[0]->usr_type != 'admin'): ?>
+                        readonly
+                        <?php endif; ?>
+                        class="form-control" type="date" value="<?php echo (set_value('tanggal') != "") ? set_value('tanggal') : $absensi[0]->abs_tanggal; ?>" name="tanggal">
                         <?php if(form_error('tanggal') != ""): ?>
                         <span class="form-control-feedback" aria-hidden="true">
                             <span class="icon icon-times"></span>
@@ -104,7 +108,11 @@
                 <div class="form-group">
                     <label class="col-sm-2 control-label" for="form-control-1">Jam</label>
                     <div class="col-sm-6  <?php if(form_error('jam') != ""): ?> has-error has-feedback <?php endif; ?>" >
-                        <input id="form-control-1" class="form-control" type="time" value="<?php echo (set_value('jam') != "") ? set_value('jam') :  $absensi[0]->abs_in; ?>" name="jam">
+                        <input id="form-control-1" 
+                        <?php if($this->session->userdata('data_user')[0]->usr_type != 'admin'): ?>
+                        readonly
+                        <?php endif; ?>
+                        class="form-control" type="time" value="<?php echo (set_value('jam') != "") ? set_value('jam') :  $absensi[0]->abs_in; ?>" name="jam">
                         <?php if(form_error('jam') != ""): ?>
                         <span class="form-control-feedback" aria-hidden="true">
                             <span class="icon icon-times"></span>
@@ -116,7 +124,11 @@
                 <div class="form-group">
                     <label class="col-sm-2 control-label" for="form-control-6">Status</label>
                     <div class="col-sm-6 <?php if(form_error('status') != ""): ?> has-error has-feedback <?php endif; ?>">
-                      <select id="form-control-6" class="form-control" name="status">
+                      <select id="form-control-6" 
+                      <?php if($this->session->userdata('data_user')[0]->usr_type != 'admin'): ?>
+                        readonly
+                        <?php endif; ?>
+                      class="form-control" name="status">
                         <option value="">Pilih Status</option>
                         <?php
                             foreach(get_type_status_absen() as $key => $value)
@@ -149,12 +161,14 @@
                       </p>
                     </div>
                 </div>
+                <?php if($this->session->userdata('data_user')[0]->usr_type == 'admin'): ?>
                 <div class="form-group">
                     <label class="col-sm-2 control-label" for="form-control-6">&nbsp;</label>
                     <div class="col-sm-6">
                      <button class="btn btn-primary" type="submit">Simpan</button>
                     </div>
                 </div>
+                <?php endif; ?>
                 <?php echo form_close(); ?>
             </div>
           </div> <!-- !. card body -->

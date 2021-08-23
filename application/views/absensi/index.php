@@ -88,7 +88,11 @@
                                 </button>
                                 <ul class="dropdown-menu dropdown-menu-right">
                                 <!-- <li><a onclick="#">Hapus</a></li> -->
+                                <?php if($this->session->userdata('data_user')[0]->usr_type != 'karyawan'): ?>
                                 <li><a href="<?php echo base_url('absensi/update/'.$row->abs_id.'') ;?>">Edit</a></li>
+                                <?php else: ?>
+                                <li><a href="<?php echo base_url('absensi/update/'.$row->abs_id.'') ;?>">Lihat</a></li>
+                                <?php endif; ?>
                                 </ul>
                             </div>
                         </td>
